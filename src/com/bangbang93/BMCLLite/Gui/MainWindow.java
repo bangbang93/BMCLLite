@@ -65,6 +65,7 @@ public class MainWindow {
 			for (String ver : versions){
 				comboVersion.addItem(ver);
 			}
+			comboVersion.setSelectedItem(BMCLLite.config.lastPlayVer);
 		} catch (FileNotFoundException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -75,6 +76,11 @@ public class MainWindow {
 		frameMain.getContentPane().add(comboVersion);
 		
 		JButton btnStart = new JButton("开始游戏");
+		btnStart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(BMCLLite.selectedVersion);
+			}
+		});
 		btnStart.setBounds(311, 172, 123, 61);
 		frameMain.getContentPane().add(btnStart);
 		
@@ -86,7 +92,7 @@ public class MainWindow {
 		labsUsername.setBounds(10, 25, 55, 15);
 		frameMain.getContentPane().add(labsUsername);
 		
-		txtUserName = new JTextField();
+		txtUserName = new JTextField(BMCLLite.config.username);
 		txtUserName.setBounds(75, 22, 179, 21);
 		frameMain.getContentPane().add(txtUserName);
 		txtUserName.setColumns(10);

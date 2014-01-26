@@ -39,4 +39,10 @@ public class Version implements Serializable {
 	public static String getVersionJsonFile(String version){
 		return getVersionDir(version) + version + ".json";
 	}
+	
+	@Override
+	public String toString(){
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
 }
