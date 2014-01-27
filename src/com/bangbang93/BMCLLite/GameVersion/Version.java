@@ -29,11 +29,11 @@ public class Version implements Serializable {
 	}
 	
 	public static String[] refreshVersion() throws FileNotFoundException{
-		return FileHelper.listDirectory(BMCLLite.getCurrectDirectory() + ".minecraft/versions/");
+		return FileHelper.listDirectory(BMCLLite.getCurrectDirectory() + ".minecraft" + BMCLLite.pathSpilter + "versions" + BMCLLite.pathSpilter);
 	}
 	
 	public static String getVersionDir(String version){
-		return BMCLLite.getCurrectDirectory() + ".minecraft/versions/" + version + "/";
+		return BMCLLite.getCurrectDirectory() + ".minecraft" + BMCLLite.pathSpilter + "versions" + BMCLLite.pathSpilter + version + BMCLLite.pathSpilter;
 	}
 	
 	public static String getVersionJsonFile(String version){

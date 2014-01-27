@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -12,13 +13,17 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import com.bangbang93.BMCLLite.BMCLLite;
+import com.bangbang93.BMCLLite.Exception.DownloadLibraryFailedException;
+import com.bangbang93.BMCLLite.Exception.UnSupportVersionException;
 import com.bangbang93.BMCLLite.GameVersion.Version;
+import com.bangbang93.BMCLLite.Launcher.Launcher;
 
 public class MainWindow {
 
 	private JFrame frameMain;
 	private JComboBox<String> comboVersion;
 	private JTextField txtUserName;
+	private Launcher launcher;
 
 	/**
 	 * Launch the application.
@@ -79,6 +84,28 @@ public class MainWindow {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println(BMCLLite.selectedVersion);
+				try {
+					launcher = new Launcher(BMCLLite.config.javaw, BMCLLite.config.javaxmx,
+							BMCLLite.config.username, comboVersion.getSelectedItem().toString(),
+							BMCLLite.selectedVersion, BMCLLite.config.extraJVMArg);
+				} catch (UnSupportVersionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (DownloadLibraryFailedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (launcher != null){
+					try {
+						launcher.start();
+					} catch (DownloadLibraryFailedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
 		btnStart.setBounds(311, 172, 123, 61);

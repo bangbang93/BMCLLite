@@ -22,19 +22,23 @@ public class Downloader extends Observable implements Runnable {
     public static final int ERROR = 4;
     
     private URL url; // download URL
+    private String file;
     private int size; // size of download in bytes
     private int downloaded; // number of bytes downloaded
     private int status; // current status of download
     
     // Constructor for Download.
-    public Downloader(URL url) {
-        this.url = url;
+    public Downloader(String url, String file) {
+        try {
+			this.url = new URL(url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         size = -1;
         downloaded = 0;
         status = DOWNLOADING;
-        
-        // Begin the download.
-        download();
+        this.file = file;
     }
     
     public Downloader() {
@@ -51,6 +55,10 @@ public class Downloader extends Observable implements Runnable {
     	size = -1;
         downloaded = 0;
         status = PAUSED;
+    }
+    
+    public void setFile(String file){
+    	this.file = file;
     }
     
     // Get this download's size.
@@ -75,7 +83,7 @@ public class Downloader extends Observable implements Runnable {
     }
     
     // Resume this download.
-    public void resume() {
+    public void resume() throws IOException {
         status = DOWNLOADING;
         stateChanged();
         download();
@@ -94,20 +102,13 @@ public class Downloader extends Observable implements Runnable {
     }
     
     // Start or resume downloading.
-    private void download() {
+    public void downloadAsync() {
         Thread thread = new Thread(this);
         thread.start();
     }
     
-    // Get file name portion of URL.
-    private String getFileName(URL url) {
-        String fileName = url.getFile();
-        return fileName.substring(fileName.lastIndexOf('/') + 1);
-    }
-    
-    // Download file.
-    public void run() {
-        RandomAccessFile file = null;
+    public void download() throws IOException {
+    	RandomAccessFile file = null;
         InputStream stream = null;
         
         try {
@@ -169,8 +170,8 @@ public class Downloader extends Observable implements Runnable {
                 status = COMPLETE;
                 stateChanged();
             }
-        } catch (Exception e) {
-            error();
+        } catch (IOException e) {
+            throw e;
         } finally {
             // Close file.
             if (file != null) {
@@ -186,6 +187,21 @@ public class Downloader extends Observable implements Runnable {
                 } catch (Exception e) {}
             }
         }
+    }
+    
+    // Get file name portion of URL.
+    private String getFileName(URL url) {
+        return file;
+    }
+    
+    // Download file.
+    public void run(){
+        try {
+			download();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     // Notify observers that this download's status has changed.

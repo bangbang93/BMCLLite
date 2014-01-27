@@ -42,4 +42,15 @@ public class FileHelper {
 		}
 		return Dirs.toArray(new String[Dirs.size()]);
 	}
+
+	public static boolean ifFileVaild(String path){
+		File file = new File(path);
+		if (!file.exists()){
+			return false;
+		}
+		if (file.length() == 0){
+			return false;
+		}
+		return true;
+	}
 }
