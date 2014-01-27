@@ -223,6 +223,39 @@ public class Launcher {
     		}
     		ZipHelper.unZip(nativePath, nativeExtPath.toString(), library.extract);
     	}
+    	//TODO mods
+    	logger.info("处理Mods");
+    	File modsDir = new File(Version.getVersionDir(name) + "mods" + BMCLLite.pathSpilter);
+    	File destModsDir = new File(BMCLLite.getMinecraftDirectory() + "mods" + BMCLLite.pathSpilter);
+	    if (modsDir.exists()){
+	    	if (destModsDir.exists()){
+	    		destModsDir.renameTo(new File(BMCLLite.getMinecraftDirectory() + "mods" + timestamp + BMCLLite.pathSpilter));
+	    	}
+	    	FileHelper.copyDir(modsDir.getAbsolutePath(), destModsDir.getAbsolutePath());
+	    }
+	    logger.info("处理configs");
+	    File configDir = new File(Version.getVersionDir(name) + "config" + BMCLLite.pathSpilter);
+	    File destConfigDir = new File(BMCLLite.getMinecraftDirectory() + "config" + BMCLLite.pathSpilter);
+	    if (configDir.exists()){
+	    	if (destConfigDir.exists()){
+	    		destConfigDir.renameTo(new File(BMCLLite.getMinecraftDirectory() + "config" + timestamp + BMCLLite.pathSpilter));
+	    	}
+	    	FileHelper.copyDir(configDir.getAbsolutePath(), BMCLLite.getMinecraftDirectory() + "config" + BMCLLite.pathSpilter);
+	    }
+	    logger.info("处理coremods");
+	    File coremodsDir = new File(Version.getVersionDir(name) + "coremods" + BMCLLite.pathSpilter);
+	    File destCoremodsDir = new File(BMCLLite.getMinecraftDirectory() + "coremods" + BMCLLite.pathSpilter);
+	    if (coremodsDir.exists()){
+	    	if (destCoremodsDir.exists()){
+	    		destCoremodsDir.renameTo(new File(BMCLLite.getMinecraftDirectory() + "coremods" + timestamp + BMCLLite.pathSpilter));
+	    	}
+	    	FileHelper.copyDir(coremodsDir.getAbsolutePath(), BMCLLite.getMinecraftDirectory() + "coremods" + BMCLLite.pathSpilter);
+	    }
+	    logger.info("处理moddir");
+	    File moddirDir = new File(Version.getVersionDir(name) + "moddir" + BMCLLite.pathSpilter);
+	    if (moddirDir.exists()){
+	    	FileHelper.copyDir(moddirDir.getAbsolutePath(), BMCLLite.getMinecraftDirectory());
+	    }
     	game.directory(new File(BMCLLite.getCurrectDirectory()));
     	game.environment().put("APPDATA", BMCLLite.getCurrectDirectory());
     	if (BMCLLite.debug){

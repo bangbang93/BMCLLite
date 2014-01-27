@@ -40,9 +40,14 @@ public class ZipHelper {
 				File outputFile = new File(filename);
 				OutputStream oStream = new FileOutputStream(outputFile);
 				InputStream iStream = zipFile.getInputStream(zipEntry);
-				int b = 0;
-				while ((b = iStream.read()) != -1){
-					oStream.write(b);
+				byte[] buffer = new byte[4096];
+				int bytes = 0;
+				while (true){
+					bytes = iStream.read(buffer);
+					if (bytes < 0){
+						break;
+					}
+					oStream.write(buffer, 0, bytes);
 				}
 				oStream.close();
 				iStream.close();

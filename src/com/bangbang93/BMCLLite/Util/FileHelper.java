@@ -2,12 +2,17 @@ package com.bangbang93.BMCLLite.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.bangbang93.BMCLLite.BMCLLite;
+
 public class FileHelper {
+	
 	public static String readToEnd(String path){
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -52,5 +57,45 @@ public class FileHelper {
 			return false;
 		}
 		return true;
+	}
+
+	public static void copyFile(String src, String dest) throws IOException{
+		File srcFile = new File(src);
+		File destFile = new File(dest);
+		if (!srcFile.exists()){
+			throw new FileNotFoundException(src);
+		}
+		FileInputStream iStream = new FileInputStream(srcFile);
+		FileOutputStream oStream = new FileOutputStream(destFile);
+		byte[] buffer = new byte[4096];
+		int bytes;
+		while (true) {
+			bytes = iStream.read(buffer);
+			if (bytes < 0){
+				break;
+			}
+			oStream.write(buffer, 0, bytes);
+		}
+		iStream.close();
+		oStream.close();
+	}
+	
+	public static void copyDir(String src, String dest) throws IOException{
+		File srcFile = new File(src);
+		File destFile = new File(dest);
+		if (!srcFile.exists()){
+			throw new FileNotFoundException(src);
+		}
+		if (!destFile.exists()){
+			destFile.mkdirs();
+		}
+		File[] files = srcFile.listFiles();
+		for(File f :files){
+			if (f.isDirectory()){
+				copyDir(f.getAbsolutePath(),dest + BMCLLite.pathSpilter + f.getName());
+			} else {
+				copyFile(f.getAbsolutePath(), dest + BMCLLite.pathSpilter + f.getName());
+			}
+		}
 	}
 }
