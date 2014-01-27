@@ -56,11 +56,18 @@ public class Launcher {
     	javaArgs.append("-Xincgc ");
     	game.command().add("-Xmx" + this.javaxmx + "M");
     	javaArgs.append("-Xmx" + this.javaxmx + "M ");
-    	game.command().add(extarg.trim());
-    	javaArgs.append(extarg.trim()).append(' ');
-    	StringBuilder librariesPath = new StringBuilder("-Djava.library.path=\"");
+    	String[] extargs = extarg.split(" ");
+    	for(String arg:extargs){
+    		game.command().add(arg);
+    	}
+    	javaArgs.append(extarg.split(" ")).append(' ');
+    	StringBuilder librariesPath = new StringBuilder("-Djava.library.path=");
     	librariesPath.append(Version.getVersionDir(name)).append(name).append("-natives-").append(timestamp);
-    	librariesPath.append("\" -cp \"");
+    	game.command().add(librariesPath.toString());
+    	javaArgs.append(librariesPath).append(' ');
+    	game.command().add("-cp");
+    	javaArgs.append("-cp ");
+    	librariesPath = new StringBuilder();
     	for (Library library : info.libraries){
     		logger.info("正在准备" + library.name);
     		if (library.natives !=null){
@@ -123,7 +130,6 @@ public class Launcher {
     	logger.info("创建mc参数");
     	StringBuilder mcpath = new StringBuilder(Version.getVersionDir(name));
     	mcpath.append(name).append(".jar");
-    	mcpath.append("\"");
     	librariesPath.append(mcpath);
     	game.command().add(librariesPath.toString());
     	javaArgs.append(librariesPath.toString()).append(' ');
@@ -142,7 +148,10 @@ public class Launcher {
     	mcArg = StringHelper.replace(mcArg, "${user_properties}", "{}");
     	//TODO Auth
     	mcArg = StringHelper.replace(mcArg, "${auth_session}", "no");
-    	game.command().add(mcArg.toString());
+    	String[] args = mcArg.toString().split(" ");
+    	for(String arg:args){
+        	game.command().add(arg);
+    	}
     	logger.info(game.command().toString());
     	javaArgs.append(mcArg).append(' ');
     	logger.info(javaArgs.toString());
