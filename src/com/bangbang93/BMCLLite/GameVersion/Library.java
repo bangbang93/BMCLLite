@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import com.bangbang93.BMCLLite.BMCLLite;
 import com.bangbang93.BMCLLite.Exception.UnSupportVersionException;
+import com.bangbang93.BMCLLite.Util.FileHelper;
 import com.bangbang93.BMCLLite.Util.StringHelper;
 
 public class Library implements Serializable {
@@ -64,7 +65,7 @@ public class Library implements Serializable {
 		for (File f : files){
 			if (f.isDirectory()){
 				if (f.getName().contains("-natives-")){
-					f.delete();
+					FileHelper.deleteDir(f.getAbsolutePath());
 				}
 			}
 		}

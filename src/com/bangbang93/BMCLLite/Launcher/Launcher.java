@@ -272,4 +272,29 @@ public class Launcher {
 		return true;
     }
     
+    public void gameExit(int exitCode){
+    	logger.info("检测到游戏退出，开始恢复mod相关");
+    	if (exitCode == 0){
+    		logger.info("游戏正常退出");
+    	} else if (exitCode == 1){
+    		logger.warning("游戏退出代码为1，这可能是由于错误退出或者直接点了右上角X导致的");
+    	} else {
+    		logger.severe("游戏退出代码为" + exitCode);
+    	}
+    	StringBuilder nativeExtPath = new StringBuilder(Version.getVersionDir(name));
+    	Library.cleanOldNatives(nativeExtPath.toString());
+    	logger.info("清理logs");
+    	File modsDir = new File(Version.getVersionDir(name) + "mods" + BMCLLite.pathSpilter);
+    	File destModsDir = new File(BMCLLite.getMinecraftDirectory() + "mods" + BMCLLite.pathSpilter);
+	    if (modsDir.exists()){
+	    	try {
+	    		FileHelper.deleteDir(modsDir.getAbsolutePath());
+				FileHelper.copyDir(destModsDir.getAbsolutePath(), modsDir.getAbsolutePath());
+				FileHelper.deleteDir(destModsDir.getAbsolutePath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+    }
 }

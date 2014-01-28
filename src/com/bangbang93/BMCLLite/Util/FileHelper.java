@@ -98,4 +98,19 @@ public class FileHelper {
 			}
 		}
 	}
+
+	public static void deleteDir(String src){
+		File file = new File(src);
+		if (file.exists()){
+			File[] files = file.listFiles();
+			for (File f : files){
+				if (f.isDirectory()){
+					deleteDir(f.getAbsolutePath());
+					f.delete();
+				} else {
+					f.delete();
+				}
+			}
+		}
+	}
 }
