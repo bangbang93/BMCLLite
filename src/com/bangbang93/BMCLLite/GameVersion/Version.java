@@ -1,5 +1,6 @@
 package com.bangbang93.BMCLLite.GameVersion;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 
@@ -37,7 +38,17 @@ public class Version implements Serializable {
 	}
 	
 	public static String getVersionJsonFile(String version){
-		return getVersionDir(version) + version + ".json";
+		File jsonFile = new File(getVersionDir(version) + version + ".json");
+		if (FileHelper.ifFileVaild(jsonFile.getAbsolutePath())){
+			return jsonFile.getAbsolutePath();
+		} else {
+			File[] jsons = new File(getVersionDir(version)).listFiles(new JsonFileFilter());
+			if (jsons.length == 0){
+				return null;
+			} else {
+				return jsons[0].getAbsolutePath();
+			}
+		}
 	}
 	
 	@Override

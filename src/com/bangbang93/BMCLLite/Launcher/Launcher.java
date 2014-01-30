@@ -37,6 +37,7 @@ public class Launcher {
     private String urlLib = Url.URL_DOWNLOAD_BASE;
     private Downloader downloader = new Downloader();
     private Thread logThread;
+    private Thread waitForGameexitThread;
     private File GameLock = new File(BMCLLite.getCurrectDirectory() + "Game.lck");
     
     public Launcher(String JavaPath, String JavaXmx, String UserName, String name, Version info, String extarg) throws UnSupportVersionException, DownloadLibraryFailedException{
@@ -58,9 +59,11 @@ public class Launcher {
     	javaArgs.append("-Xmx" + this.javaxmx + "M ");
     	String[] extargs = extarg.split(" ");
     	for(String arg:extargs){
-    		game.command().add(arg);
+    		if (!arg.trim().isEmpty()){
+    			game.command().add(arg);
+    			javaArgs.append(arg).append(' ');
+    		}
     	}
-    	javaArgs.append(extarg.split(" ")).append(' ');
     	StringBuilder librariesPath = new StringBuilder("-Djava.library.path=");
     	librariesPath.append(Version.getVersionDir(name)).append(name).append("-natives-").append(timestamp);
     	game.command().add(librariesPath.toString());
@@ -129,7 +132,7 @@ public class Launcher {
     	}
     	logger.info("创建mc参数");
     	StringBuilder mcpath = new StringBuilder(Version.getVersionDir(name));
-    	mcpath.append(name).append(".jar");
+    	mcpath.append(info.id).append(".jar");
     	librariesPath.append(mcpath);
     	game.command().add(librariesPath.toString());
     	javaArgs.append(librariesPath.toString()).append(' ');
@@ -164,6 +167,7 @@ public class Launcher {
     	nativeExtPath.append(version).append("-natives-").append(timestamp).append(BMCLLite.pathSpilter);
     	File nativeExtPathFile = new File(nativeExtPath.toString());
     	nativeExtPathFile.mkdir();
+    	logger.info(nativeExtPathFile.getAbsolutePath());
     	for (Library library: gameinfo.libraries){
     		if (library.natives == null){
     			continue;
@@ -265,6 +269,9 @@ public class Launcher {
     	}
 		runningGame = game.start();
 		GameLock.createNewFile();
+		waitForGameexitThread = new Thread(new ThreadWaitGameExit(this, runningGame));
+		waitForGameexitThread.start();
+		
 		if (BMCLLite.debug){
 			logThread = new Thread(new OutputDebugger(new BufferedOutputStream(runningGame.getOutputStream()), new BufferedInputStream(runningGame.getErrorStream())));
 			logThread.run();
@@ -283,7 +290,7 @@ public class Launcher {
     	}
     	StringBuilder nativeExtPath = new StringBuilder(Version.getVersionDir(name));
     	Library.cleanOldNatives(nativeExtPath.toString());
-    	logger.info("清理logs");
+    	logger.info("清理mods");
     	File modsDir = new File(Version.getVersionDir(name) + "mods" + BMCLLite.pathSpilter);
     	File destModsDir = new File(BMCLLite.getMinecraftDirectory() + "mods" + BMCLLite.pathSpilter);
 	    if (modsDir.exists()){
@@ -295,6 +302,49 @@ public class Launcher {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	    }
+	    logger.info("清理coremods");
+    	File coreModsDir = new File(Version.getVersionDir(name) + "coremods" + BMCLLite.pathSpilter);
+    	File destCoreModsDir = new File(BMCLLite.getMinecraftDirectory() + "coremods" + BMCLLite.pathSpilter);
+	    if (modsDir.exists()){
+	    	try {
+	    		FileHelper.deleteDir(coreModsDir.getAbsolutePath());
+				FileHelper.copyDir(destCoreModsDir.getAbsolutePath(), coreModsDir.getAbsolutePath());
+				FileHelper.deleteDir(destCoreModsDir.getAbsolutePath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+	    logger.info("清理config");
+    	File configDir = new File(Version.getVersionDir(name) + "config" + BMCLLite.pathSpilter);
+    	File destConfigDir = new File(BMCLLite.getMinecraftDirectory() + "config" + BMCLLite.pathSpilter);
+	    if (modsDir.exists()){
+	    	try {
+	    		FileHelper.deleteDir(configDir.getAbsolutePath());
+				FileHelper.copyDir(destConfigDir.getAbsolutePath(), configDir.getAbsolutePath());
+				FileHelper.deleteDir(destConfigDir.getAbsolutePath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+	    logger.info("清理moddir");
+	    File moddirDir = new File(Version.getVersionDir(name) + "moddir" + BMCLLite.pathSpilter);
+	    if (moddirDir.exists()){
+	    	File[] moddirDirs = moddirDir.listFiles();
+	    	for(File moddir : moddirDirs){
+	    		File destModdirDir = new File(BMCLLite.getMinecraftDirectory() + moddir.getName());
+	    		if (destModdirDir.exists()){
+	    			try{
+		    			FileHelper.deleteDir(moddir.getAbsolutePath());
+		    			FileHelper.copyDir(destModdirDir.getAbsolutePath(), moddirDir.getAbsolutePath() + BMCLLite.pathSpilter + destModdirDir.getName() + BMCLLite.pathSpilter);
+		    			FileHelper.deleteDir(destModdirDir.getAbsolutePath());
+	    			} catch (IOException e){
+	    				e.printStackTrace();
+	    			}
+	    		}
+	    	}
 	    }
     }
 }

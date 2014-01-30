@@ -112,5 +112,6 @@ public class FileHelper {
 				}
 			}
 		}
+		file.delete();
 	}
 }
